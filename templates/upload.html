@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}tudo upload page{% end %}
+
+{% block content %}
+<div>
+    <form action="/upload" enctype="multipart/form-data" method="post">
+        <input type="file" name="newimg">
+        <input type="submit">
+    </form>
+</div>
+{% end %}

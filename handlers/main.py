@@ -1,25 +1,49 @@
 import tornado.web
+from utils.photo import get_images,make_thumb
 
 
 class IndexHandler(tornado.web.RequestHandler):
     """
     Home page for user, photo feeds of follow.
     """
+
     def get(self, *args, **kwargs):
-        self.render('index.html')
+        names = get_images('uploads')
+        self.render('index.html', imgs=names)
 
 
 class ExploreHandler(tornado.web.RequestHandler):
     """
     Explore page, photo of other users.
     """
+
     def get(self, *args, **kwargs):
-        self.render('explore.html')
+        names = get_images('uploads/thumbs')
+        self.render('explore.html',imgs = names)
 
 
 class PostHandler(tornado.web.RequestHandler):
     """
     Single photo page, and maybe comments.
     """
+
     def get(self, post_id):
         self.render('post.html', post_id=post_id)
+
+
+class UploadFileHandler(tornado.web.RequestHandler):
+    """
+    处理上传的图片文件，保存到硬盘
+    """
+
+    def get(self, *args, **kwargs):
+        self.render('upload.html')
+
+    def post(self, *args, **kwargs):
+        img_files = self.request.files.get('newimg', None)
+        for img in img_files:
+            save_to = './static/uploads/{}'.format(img['filename'])
+            with open(save_to, 'wb') as f:
+                f.write(img['body'])
+            make_thumb(save_to)
+        self.write('upload done')

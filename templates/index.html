@@ -3,7 +3,7 @@
 {% block title %}index page{% end %}
 
 {% block content %}
-    {% for i in range(1, 5) %}
-    <img src="{{ static_url("images/{}.jpg".format(i)) }}" width="560px" height="800px" />
+    {% for i in imgs %}
+    <img src="{{ static_url(i) }}" width="560px" height="800px" />
     {% end %}
 {% end %}

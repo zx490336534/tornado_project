@@ -15,6 +15,7 @@ class Application(tornado.web.Application):
             ('/', main.IndexHandler),
             ('/explore', main.ExploreHandler),
             ('/post/(?P<post_id>[0-9]+)', main.PostHandler),
+            ('/upload', main.UploadFileHandler),
         ]
         settings = dict(
             debug=True,
