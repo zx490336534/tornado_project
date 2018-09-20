@@ -1,25 +1,33 @@
 import tornado.web
-from utils.photo import get_images,make_thumb
+from pycket.session import SessionMixin
+from utils.photo import get_images, make_thumb
 
 
-class IndexHandler(tornado.web.RequestHandler):
+class AuthBaseHandler(tornado.web.RequestHandler, SessionMixin):
+    def get_current_user(self):
+        return self.session.get('tudo_user_info')
+
+
+class IndexHandler(AuthBaseHandler):
     """
     Home page for user, photo feeds of follow.
     """
 
+    @tornado.web.authenticated  # self.current_user 非None
     def get(self, *args, **kwargs):
         names = get_images('uploads')
         self.render('index.html', imgs=names)
 
 
-class ExploreHandler(tornado.web.RequestHandler):
+class ExploreHandler(AuthBaseHandler):
     """
     Explore page, photo of other users.
     """
 
+    @tornado.web.authenticated
     def get(self, *args, **kwargs):
         names = get_images('uploads/thumbs')
-        self.render('explore.html',imgs = names)
+        self.render('explore.html', imgs=names)
 
 
 class PostHandler(tornado.web.RequestHandler):
