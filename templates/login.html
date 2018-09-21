@@ -5,7 +5,7 @@
 {% block content %}
 <div class="">
     <div class="">
-        <form action="/login?next={{ '/' }}" method="post" enctype="multipart/form-data">
+        <form action="/login?next={{next_url}}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 Username
                 <input autofocus="" class="form-control" id="id_username" maxlength="254" name="username" type="text" required="">

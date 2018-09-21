@@ -16,6 +16,7 @@ class Application(tornado.web.Application):
             ('/post/(?P<post_id>[0-9]+)', main.PostHandler),
             ('/upload', main.UploadFileHandler),
             ('/login', auth.LoginHandler),
+            ('/loginout', auth.LogoutHandler),
         ]
         settings = dict(
             debug=True,
@@ -28,7 +29,7 @@ class Application(tornado.web.Application):
                 'storage': {
                     'host': 'localhost',
                     'port': 6379,
-                    'db_sessions': 5,
+                    'db_sessions': 5,#select 5
                     'db_notifications': 11,
                     'max_connections': 2 ** 30,
                 },
