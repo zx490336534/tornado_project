@@ -3,5 +3,5 @@
 {% block title %}post page{% end %}
 
 {% block content %}
-    <img src="{{ static_url("images/{}.jpg".format(post_id)) }}" width="560px" />
+    <img src="{{ static_url(posts.image_url) }}" width="560px" />
 {% end %}

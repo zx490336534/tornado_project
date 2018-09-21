@@ -3,7 +3,7 @@
 {% block title %}explore page{% end %}
 
 {% block content %}
-    {% for i in imgs %}
-    <img src="{{ static_url(i) }}" width="200px"/>
+    {% for i in posts %}
+    <img src="{{ static_url(i.thumb_url) }}" width="200px"/>
     {% end %}
 {% end %}
