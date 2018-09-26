@@ -2,8 +2,6 @@
 # Auth:zx
 # Time:2018/9/20 0020 21:35
 import tornado.web
-
-from photo import make_thumb
 from .main import AuthBaseHandler
 from utils.account import authenticate, register
 

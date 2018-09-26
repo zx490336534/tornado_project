@@ -1,6 +1,6 @@
 import tornado.web
 from pycket.session import SessionMixin
-from utils.photo import get_images, make_thumb
+from utils.photo import get_images,ImageSave
 from utils.account import add_post, get_post_for, get_post
 
 
@@ -55,13 +55,9 @@ class UploadFileHandler(AuthBaseHandler):
     def post(self, *args, **kwargs):
         img_files = self.request.files.get('newimg', None)
         for img in img_files:
-            image_url = 'uploads/{}'.format(img['filename'])
-            save_to = './static/{}'.format(image_url)
-            with open(save_to, 'wb') as f:
-                f.write(img['body'])
-            save_thumb_to = make_thumb(save_to)
-            import os
-            thumb_url = os.path.relpath(save_thumb_to, 'static')
+            img_saver = ImageSave(self.settings['static_path'],img['filename'])
+            img_saver.save_upload(img['body'])
+            img_saver.make_thumb()
 
-            add_post(self.current_user, image_url, thumb_url)
+            add_post(self.current_user, img_saver.upload_url, img_saver.thumb_url)
         self.write('upload done')
