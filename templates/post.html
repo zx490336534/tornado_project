@@ -4,4 +4,5 @@
 
 {% block content %}
     <img src="{{ static_url(posts.image_url) }}" width="560px" />
+    upload by {{ posts.user.name }}
 {% end %}

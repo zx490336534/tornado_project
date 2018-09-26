@@ -4,6 +4,8 @@
 
 {% block content %}
     {% for i in posts %}
+<a href="/post/{{ i.id }}">
     <img src="{{ static_url(i.image_url) }}" width="560px" height="800px" />
+</a>
     {% end %}
 {% end %}

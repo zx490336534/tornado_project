@@ -1,7 +1,7 @@
 import tornado.web
 from pycket.session import SessionMixin
 from utils.photo import get_images,ImageSave
-from utils.account import add_post, get_post_for, get_post
+from utils.account import add_post, get_post_for, get_post,get_all_posts
 
 
 class AuthBaseHandler(tornado.web.RequestHandler, SessionMixin):
@@ -27,7 +27,7 @@ class ExploreHandler(AuthBaseHandler):
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        posts = get_post_for(self.current_user)
+        posts = get_all_posts() #展示全部用户上传的图片
         self.render('explore.html', posts=posts)
 
 
@@ -54,10 +54,12 @@ class UploadFileHandler(AuthBaseHandler):
     @tornado.web.authenticated
     def post(self, *args, **kwargs):
         img_files = self.request.files.get('newimg', None)
+        post_id = 0
         for img in img_files:
             img_saver = ImageSave(self.settings['static_path'],img['filename'])
             img_saver.save_upload(img['body'])
             img_saver.make_thumb()
 
-            add_post(self.current_user, img_saver.upload_url, img_saver.thumb_url)
-        self.write('upload done')
+            post = add_post(self.current_user, img_saver.upload_url, img_saver.thumb_url)
+            post_id = post.id
+        self.redirect('/post/{}'.format(post_id))

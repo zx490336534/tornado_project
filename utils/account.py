@@ -41,6 +41,7 @@ def add_post(username, image_url, thumb_url):
     post = Post(image_url=image_url, thumb_url=thumb_url, user=user)
     session.add(post)
     session.commit()
+    return post
 
 def get_post_for(username):
     user = session.query(User).filter_by(name=username).first()
@@ -52,3 +53,7 @@ def get_post_for(username):
 def get_post(post_id):
     post = session.query(Post).filter_by(id=post_id).first()
     return post
+
+def get_all_posts():
+    posts = session.query(Post).order_by(Post.id.desc()).all()
+    return posts
