@@ -3,9 +3,19 @@
 {% block title %}index page{% end %}
 
 {% block content %}
+
+    <div class="row">
+        <div class="col col-md-8">
     {% for i in posts %}
-<a href="/post/{{ i.id }}">
-    <img src="{{ static_url(i.image_url) }}" width="560px" height="800px" />
-</a>
+            <a href="/post/{{ i.id }}">
+                <img src="{{ static_url(i.image_url) }}" class="img-fluid" width="560px" height="800px" />
+            </a>
     {% end %}
+        </div>
+        <div class="d-none d-sm-none d-md-block col-md-4">
+            4 col
+        </div>
+    </div>
+
+
 {% end %}
