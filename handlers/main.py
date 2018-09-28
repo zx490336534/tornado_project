@@ -1,7 +1,7 @@
 import tornado.web
 from pycket.session import SessionMixin
-from utils.photo import get_images,ImageSave
-from utils.account import add_post, get_post_for, get_post, get_all_posts, get_user, get_like_posts
+from utils.photo import get_images, ImageSave
+from utils.account import add_post, get_post_for, get_post, get_all_posts, get_user, get_like_posts, get_like_count
 
 
 class AuthBaseHandler(tornado.web.RequestHandler, SessionMixin):
@@ -27,7 +27,7 @@ class ExploreHandler(AuthBaseHandler):
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        posts = get_all_posts() #展示全部用户上传的图片
+        posts = get_all_posts()  # 展示全部用户上传的图片
         self.render('explore.html', posts=posts)
 
 
@@ -35,18 +35,21 @@ class PostHandler(tornado.web.RequestHandler):
     """
     Single photo page,and maybe comments.
     """
+
     def get(self, post_id):
         posts = get_post(post_id)
         if not posts:
             self.write('post id not exists')
         else:
-            self.render('post.html', posts=posts)
+            like_count = get_like_count(posts)
+            self.render('post.html', posts=posts, like_count=like_count)
 
 
 class UploadFileHandler(AuthBaseHandler):
     """
     处理上传的图片文件，保存到硬盘
     """
+
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         self.render('upload.html')
@@ -56,7 +59,7 @@ class UploadFileHandler(AuthBaseHandler):
         img_files = self.request.files.get('newimg', None)
         post_id = 0
         for img in img_files:
-            img_saver = ImageSave(self.settings['static_path'],img['filename'])
+            img_saver = ImageSave(self.settings['static_path'], img['filename'])
             img_saver.save_upload(img['body'])
             img_saver.make_thumb()
 
@@ -64,12 +67,17 @@ class UploadFileHandler(AuthBaseHandler):
             post_id = post.id
         self.redirect('/post/{}'.format(post_id))
 
+
 class ProfileHander(AuthBaseHandler):
     """
     显示用户上传的图片和喜欢的图片列表
     """
+
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        user = get_user(self.current_user)
+        username = self.get_argument('name', None)
+        if not username:
+            username = self.current_user
+        user = get_user(username)
         like_posts = get_like_posts(user)
-        self.render('profile.html',user=user,like_posts=like_posts)
+        self.render('profile.html', user=user, like_posts=like_posts)

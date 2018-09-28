@@ -43,6 +43,7 @@ def add_post(username, image_url, thumb_url):
     session.commit()
     return post
 
+
 def get_post_for(username):
     user = session.query(User).filter_by(name=username).first()
     if user:
@@ -50,17 +51,21 @@ def get_post_for(username):
     else:
         return []
 
+
 def get_post(post_id):
     post = session.query(Post).filter_by(id=post_id).first()
     return post
+
 
 def get_all_posts():
     posts = session.query(Post).order_by(Post.id.desc()).all()
     return posts
 
+
 def get_user(username):
     user = session.query(User).filter_by(name=username).first()
     return user
+
 
 def get_like_posts(user):
     """
@@ -68,5 +73,12 @@ def get_like_posts(user):
     :param user:User的实例
     :return:
     """
-    posts = session.query(Post).filter(Like.user_id==user.id,Post.id==Like.post_id).all()
+    posts = session.query(Post).filter(Like.user_id == user.id,
+                                       Post.id == Like.post_id,
+                                       Post.user_id != user.id).all()
     return posts
+
+
+def get_like_count(post):
+    count = session.query(Like).filter_by(post_id=post.id).count()
+    return count

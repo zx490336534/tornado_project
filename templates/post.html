@@ -3,6 +3,10 @@
 {% block title %}post page{% end %}
 
 {% block content %}
-    <img src="{{ static_url(posts.image_url) }}" width="560px" />
-    upload by {{ posts.user.name }}
+    <img src="{{ static_url(posts.image_url) }}" width="560px"/>
+    <span class="h2"> upload by {{ posts.user.name }}
+    {% if like_count %}
+        <i class="fa fa-heart text-danger"></i>{{ like_count }}
+    {% end %}
+    </span>
 {% end %}
