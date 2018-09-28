@@ -1,7 +1,7 @@
 import tornado.web
 from pycket.session import SessionMixin
 from utils.photo import get_images,ImageSave
-from utils.account import add_post, get_post_for, get_post,get_all_posts
+from utils.account import add_post, get_post_for, get_post, get_all_posts, get_user, get_like_posts
 
 
 class AuthBaseHandler(tornado.web.RequestHandler, SessionMixin):
@@ -63,3 +63,13 @@ class UploadFileHandler(AuthBaseHandler):
             post = add_post(self.current_user, img_saver.upload_url, img_saver.thumb_url)
             post_id = post.id
         self.redirect('/post/{}'.format(post_id))
+
+class ProfileHander(AuthBaseHandler):
+    """
+    显示用户上传的图片和喜欢的图片列表
+    """
+    @tornado.web.authenticated
+    def get(self, *args, **kwargs):
+        user = get_user(self.current_user)
+        like_posts = get_like_posts(user)
+        self.render('profile.html',user=user,like_posts=like_posts)

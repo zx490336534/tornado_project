@@ -3,7 +3,7 @@
 # Time:2018/9/20 0020 21:46
 import hashlib
 
-from models.account import User, session, Post
+from models.account import User, session, Post, Like
 
 
 def hashed(text):
@@ -56,4 +56,17 @@ def get_post(post_id):
 
 def get_all_posts():
     posts = session.query(Post).order_by(Post.id.desc()).all()
+    return posts
+
+def get_user(username):
+    user = session.query(User).filter_by(name=username).first()
+    return user
+
+def get_like_posts(user):
+    """
+    查询用户喜欢的图片 posts
+    :param user:User的实例
+    :return:
+    """
+    posts = session.query(Post).filter(Like.user_id==user.id,Post.id==Like.post_id).all()
     return posts
