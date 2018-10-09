@@ -1,3 +1,4 @@
 .idea
-static/
+static/images
+static/uploads
 *.pyc
