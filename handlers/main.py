@@ -31,7 +31,7 @@ class ExploreHandler(AuthBaseHandler):
         self.render('explore.html', posts=posts)
 
 
-class PostHandler(tornado.web.RequestHandler):
+class PostHandler(AuthBaseHandler):
     """
     Single photo page,and maybe comments.
     """
