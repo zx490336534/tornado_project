@@ -31,7 +31,8 @@ class AsyncURLSaveHandler(AuthBaseHandler):
         img_saver.save_upload(resp.body)
         img_saver.make_thumb()
         user = self.get_argument('user','')
-        if user:
+        is_from_room = self.get_argument('room','') == 'room'
+        if user and is_from_room:
             post = add_post(user, img_saver.upload_url, img_saver.thumb_url)
             print(f'--  {datetime.now()} -end fetch:#{post.id}')
             chat = make_chat(f'-----[{user}]-----',img_saver.thumb_url)
