@@ -1,1 +1,7 @@
-<div class="message" id="m{{ message['id'] }}">{% module linkify(message['body']) %}</div>
+<div class="message" id="m{{ message['id'] }}">{% module linkify(message['body']) %}<br>
+    {% if message['img_url'] %}
+        <a href="/post/{{ message['post_id'] }}">
+            <img src="{{ static_url(message['img_url']) }}">
+        </a>
+    {% end %}
+</div>

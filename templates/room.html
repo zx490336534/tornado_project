@@ -3,14 +3,8 @@
 {% block title %}room page{% end %}
 
 {% block content %}
-room
+<h1><i class="fa fa-venus-mars"></i>room</h1>
 <div id="body">
-    <div id="inbox">
-        {% for message in messages %}
-        {% raw message['html'] %}
-{#        {{ message }}#}
-        {% end %}
-    </div>
     <div id="input">
         <form action="#" method="post" id="messageform">
             <table>
@@ -22,6 +16,12 @@ room
                 </tr>
             </table>
         </form>
+    </div>
+    <div id="inbox">
+        {% for message in messages %}
+            {% raw message['html'] %}
+{#        {{ message }}#}
+        {% end %}
     </div>
 </div>
 {% end %}
