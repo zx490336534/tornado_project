@@ -10,7 +10,7 @@ import tornado.escape
 from .main import AuthBaseHandler
 from .chat import ChatSocketHandler,make_chat
 from utils.photo import ImageSave
-from utils.account import add_post
+
 
 
 class AsyncURLSaveHandler(AuthBaseHandler):
@@ -30,12 +30,13 @@ class AsyncURLSaveHandler(AuthBaseHandler):
         img_saver = ImageSave(self.settings['static_path'], 'x.jpg')
         img_saver.save_upload(resp.body)
         img_saver.make_thumb()
-        user = self.get_argument('user','')
-        is_from_room = self.get_argument('room','') == 'room'
-        if user and is_from_room:
-            post = add_post(user, img_saver.upload_url, img_saver.thumb_url)
+        username = self.get_argument('user','')
+        is_from_room = self.get_argument('from','') == 'room'
+        if username and is_from_room:
+            self.orm.username=username
+            post = self.orm.add_post_for_user(img_saver.upload_url, img_saver.thumb_url)
             print(f'--  {datetime.now()} -end fetch:#{post.id}')
-            chat = make_chat(f'-----[{user}]-----',img_saver.thumb_url)
+            chat = make_chat(f'-----[{username}]-----',img_saver.thumb_url)
             chat['post_id'] = post.id
             chat['html'] = tornado.escape.to_basestring(self.render_string('message.html', message=chat))
             ChatSocketHandler.update_cache(chat)
