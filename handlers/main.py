@@ -1,12 +1,20 @@
 import tornado.web
 from pycket.session import SessionMixin
 from utils.photo import get_images, ImageSave
-from utils.account import add_post, get_post_for, get_post, get_all_posts, get_user, get_like_posts, get_like_count
+from utils.account import HandlerORM
+from models.db import DBSession
 
 
 class AuthBaseHandler(tornado.web.RequestHandler, SessionMixin):
     def get_current_user(self):
         return self.session.get('tudo_user_info')
+
+    def prepare(self):
+        self.db_session = DBSession()
+        self.orm = HandlerORM(self.db_session)
+
+    def on_finish(self):
+        self.db_session.close()
 
 
 class IndexHandler(AuthBaseHandler):
@@ -16,7 +24,7 @@ class IndexHandler(AuthBaseHandler):
 
     @tornado.web.authenticated  # self.current_user 非None
     def get(self, *args, **kwargs):
-        posts = get_post_for(self.current_user)
+        posts = self.orm.get_post_for(self.current_user)
         self.render('index.html', posts=posts)
 
 
@@ -27,7 +35,7 @@ class ExploreHandler(AuthBaseHandler):
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        posts = get_all_posts()  # 展示全部用户上传的图片
+        posts = self.orm.get_all_posts()  # 展示全部用户上传的图片
         self.render('explore.html', posts=posts)
 
 
@@ -37,11 +45,11 @@ class PostHandler(AuthBaseHandler):
     """
 
     def get(self, post_id):
-        posts = get_post(post_id)
+        posts = self.orm.get_post(post_id)
         if not posts:
             self.write('post id not exists')
         else:
-            like_count = get_like_count(posts)
+            like_count = self.orm.get_like_count(posts)
             self.render('post.html', posts=posts, like_count=like_count)
 
 
@@ -63,7 +71,7 @@ class UploadFileHandler(AuthBaseHandler):
             img_saver.save_upload(img['body'])
             img_saver.make_thumb()
 
-            post = add_post(self.current_user, img_saver.upload_url, img_saver.thumb_url)
+            post = self.orm.add_post_for_user(self.current_user, img_saver.upload_url, img_saver.thumb_url)
             post_id = post.id
         self.redirect('/post/{}'.format(post_id))
 
@@ -78,6 +86,6 @@ class ProfileHander(AuthBaseHandler):
         username = self.get_argument('name', None)
         if not username:
             username = self.current_user
-        user = get_user(username)
-        like_posts = get_like_posts(user)
+        user = self.orm.get_user(username)
+        like_posts = self.orm.get_like_posts(user)
         self.render('profile.html', user=user, like_posts=like_posts)

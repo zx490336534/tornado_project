@@ -44,6 +44,14 @@ def add_post(username, image_url, thumb_url):
     return post
 
 
+def add_post_for_user(db_session, username, image_url, thumb_url):
+    user = db_session.query(User).filter_by(name=username).first()
+    post = Post(image_url=image_url, thumb_url=thumb_url, user=user)
+    db_session.add(post)
+    db_session.commit()
+    return post
+
+
 def get_post_for(username):
     user = session.query(User).filter_by(name=username).first()
     if user:
@@ -52,7 +60,9 @@ def get_post_for(username):
         return []
 
 
-def get_post(post_id):
+def get_post(post_id, db_session=None):
+    if db_session:
+        session = db_session
     post = session.query(Post).filter_by(id=post_id).first()
     return post
 
@@ -82,3 +92,53 @@ def get_like_posts(user):
 def get_like_count(post):
     count = session.query(Like).filter_by(post_id=post.id).count()
     return count
+
+
+class HandlerORM:
+    """
+    和 RequestHandler配合使用的数据库连接工具类 由Requesthandler来调用并初始化和传入session 和执行session.close()
+    """
+
+    def __init__(self, db_session):
+        self.db = db_session
+
+    def add_post_for_user(self, username, image_url, thumb_url):
+        user = self.db.query(User).filter_by(name=username).first()
+        post = Post(image_url=image_url, thumb_url=thumb_url, user=user)
+        self.db.add(post)
+        self.db.commit()
+        return post
+
+    def get_post_for(self, username):
+        user = self.db.query(User).filter_by(name=username).first()
+        if user:
+            return user.posts
+        else:
+            return []
+
+    def get_post(self, post_id):
+        post = self.db.query(Post).filter_by(id=post_id).first()
+        return post
+
+    def get_all_posts(self):
+        posts = self.db.query(Post).order_by(Post.id.desc()).all()
+        return posts
+
+    def get_user(self, username):
+        user = self.db.query(User).filter_by(name=username).first()
+        return user
+
+    def get_like_posts(self, user):
+        """
+        查询用户喜欢的图片 posts
+        :param user:User的实例
+        :return:
+        """
+        posts = self.db.query(Post).filter(Like.user_id == user.id,
+                                           Post.id == Like.post_id,
+                                           Post.user_id != user.id).all()
+        return posts
+
+    def get_like_count(self, post):
+        count = self.db.query(Like).filter_by(post_id=post.id).count()
+        return count
