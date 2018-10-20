@@ -20,7 +20,7 @@ class LoginHandler(AuthBaseHandler):
         password = self.get_argument('password', None)
         next_url = self.get_argument('next', '/')
 
-        passed = authenticate(username, password)
+        passed = authenticate(username, password, self.db_session)
 
         if passed:
             self.session.set('tudo_user_info', username)  # 与main中的get('tudo_user_info')对应
@@ -63,6 +63,3 @@ class SignupHandler(AuthBaseHandler):
                     self.write(ret)
         else:
             self.render('signup.html', msg={'register fail'})
-
-
-

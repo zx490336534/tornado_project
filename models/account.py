@@ -34,8 +34,8 @@ class User(Base):
         session.commit()
 
     @classmethod
-    def get_pass(cls, username):
-        user = session.query(cls).filter_by(name=username).first()
+    def get_pass(cls, username,db_session):
+        user = db_session.query(cls).filter_by(name=username).first()
         if user:
             return user.password
         else:

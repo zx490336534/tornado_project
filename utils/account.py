@@ -3,14 +3,14 @@
 # Time:2018/9/20 0020 21:46
 import hashlib
 
-from models.account import User, session, Post, Like
+from models.account import User, Post, Like
 
 
 def hashed(text):
     return hashlib.md5(text.encode('utf8')).hexdigest()
 
 
-def authenticate(username, password):
+def authenticate(username, password, db_session):
     """
     校验用户名和密码是否符合记录
     :param username:
@@ -18,7 +18,7 @@ def authenticate(username, password):
     :return:
     """
     if username and password:
-        hashed_password = User.get_pass(username)
+        hashed_password = User.get_pass(username, db_session)
         return hashed(password) == hashed_password
     else:
         return False
@@ -32,13 +32,12 @@ def register(username, password):
     return {'msg': 'ok'}
 
 
-
 class HandlerORM:
     """
     和 RequestHandler配合使用的数据库连接工具类
     """
 
-    def __init__(self, db_session,username):
+    def __init__(self, db_session, username):
         """
 
         :param db_session: 由RequestHandler来调用并初始化和传入session 和执行session.close()
