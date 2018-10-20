@@ -96,21 +96,27 @@ def get_like_count(post):
 
 class HandlerORM:
     """
-    和 RequestHandler配合使用的数据库连接工具类 由Requesthandler来调用并初始化和传入session 和执行session.close()
+    和 RequestHandler配合使用的数据库连接工具类
     """
 
-    def __init__(self, db_session):
-        self.db = db_session
+    def __init__(self, db_session,username):
+        """
 
-    def add_post_for_user(self, username, image_url, thumb_url):
-        user = self.db.query(User).filter_by(name=username).first()
+        :param db_session: 由RequestHandler来调用并初始化和传入session 和执行session.close()
+        :param username: pycket session记录的名字
+        """
+        self.db = db_session
+        self.username = username
+
+    def add_post_for_user(self, image_url, thumb_url):
+        user = self.get_user()
         post = Post(image_url=image_url, thumb_url=thumb_url, user=user)
         self.db.add(post)
         self.db.commit()
         return post
 
-    def get_post_for(self, username):
-        user = self.db.query(User).filter_by(name=username).first()
+    def get_post_for_user(self):
+        user = self.get_user()
         if user:
             return user.posts
         else:
@@ -124,8 +130,12 @@ class HandlerORM:
         posts = self.db.query(Post).order_by(Post.id.desc()).all()
         return posts
 
-    def get_user(self, username):
-        user = self.db.query(User).filter_by(name=username).first()
+    def get_user(self):
+        """
+        由用户名获取对应记录
+        :return:
+        """
+        user = self.db.query(User).filter_by(name=self.username).first()
         return user
 
     def get_like_posts(self, user):
